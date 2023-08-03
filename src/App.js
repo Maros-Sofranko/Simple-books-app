@@ -1,20 +1,27 @@
-import { useState } from "react";
-import { v4 as uuid } from "uuid";
+import { useEffect, useState } from "react";
 import CreateBook from "./components/CreateBook";
 import BooksList from "./components/BooksList";
+import axios from "axios";
 
 function App() {
   const [books, setBooks] = useState([]);
 
-  const generateId = () => {
-    return uuid();
-  };
+  useEffect(() => {
+    const fetchBooks = async () => {
+      const response = await axios.get("http://localhost:3001/books");
 
-  const createBook = (bookTitle) => {
-    setBooks((prevBooks) => [
-      ...prevBooks,
-      { id: generateId(), title: bookTitle },
-    ]);
+      setBooks(response.data);
+    };
+
+    fetchBooks();
+  }, []);
+
+  const createBook = async (bookTitle) => {
+    const response = await axios.post("http://localhost:3001/books", {
+      title: bookTitle,
+    });
+
+    setBooks((prevBooks) => [...prevBooks, response.data]);
   };
 
   const deleteBookById = (bookId) => {
